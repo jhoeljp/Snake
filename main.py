@@ -1,10 +1,12 @@
 import sys, pygame, time
 import random
 
-WHITE = (255,255,255)
+# WHITE = (255,255,255)
 BLACK = (0,0,0)
-APPLE_color = (255,0,0)
-SNAKE_color = (0,255,0)
+WHITE = (168,228,10)
+# BLACK = (168,228,10)
+APPLE_color = (204,0,0)
+SNAKE_color = (204,102,0)
 
 N = 18
 HEIGHT = 30
@@ -63,12 +65,15 @@ def color_square(x,y,color):
 
 def movement(dir):
     global apple_pos
+    global Speed
 
     new_pos_x = snake_pos[0].val_x()
     new_pos_y = snake_pos[0].val_y()
-    #delete prev snake
+    #delete prev snake tail
     color_square(new_pos_x,new_pos_y,BLACK)
-    print("Blacking: ",snake_pos[0].list_form())
+
+    # print("Blacking: ",snake_pos[0].list_form())
+
     #augment coordinates based on snake's direction
     if dir == 'N':
         new_pos_y = new_pos_y - 1
@@ -81,20 +86,40 @@ def movement(dir):
 
     #eating apple phase
 
-    #no hit
+    #no hit #keep moving
     if snake_pos[0].list_form() != apple_pos.list_form():
         blk = snake_pos[len(snake_pos)-1]
         color_square(blk.val_x(),blk.val_y(),BLACK)
         snake_pos.pop()
-    #hit
+    #hit a.k.a eats apple
     else:
-        print("hit")
+        #increase speed
+        Speed -= 0.010
+        print ("speed: %d" %(1/Speed) )
         #new apple location
         apple_pos = random_draw(APPLE_color)
 
-    #tail moves
+    #head moves to new position
     snake_pos.insert(0,(Point(new_pos_x,new_pos_y)))
-    #to new position
+
+    #if not touching itself
+    # for i in range(1,len(snake_pos)):
+    #     body_x = snake_pos[i].val_x()
+    #     body_y = snake_pos[i].val_y()
+    #
+    #     X_coor = new_pos_x == body_x
+    #     Y_coor = new_pos_y == body_y
+    #
+    #     if X_coor != Y_coor:
+    #     #if not touching itself
+    #     # color_square(new_pos_x,new_pos_y,SNAKE_color)
+    #         color_square(body_x,body_y,SNAKE_color)
+    #     #stepped on
+    #     else:
+    #         pygame.quit()
+    #         sys.exit()
+
+    #if not hitting borders
     if new_pos_x <= N-1 and new_pos_y<= N-1:
         if new_pos_x >= 0 and new_pos_y >= 0:
             for bod in snake_pos:
@@ -104,10 +129,10 @@ def movement(dir):
     else:
         pygame.quit()
         sys.exit()
-    tmp = ''
-    for i in range(0,len(snake_pos)):
-        tmp += str(snake_pos[i].list_form())
-    print(tmp)
+    # tmp = ''
+    # for i in range(0,len(snake_pos)):
+    #     tmp += str(snake_pos[i].list_form())
+    # print(tmp)
 
 #start game variables
 loop = True
@@ -121,6 +146,8 @@ snake_pos = []
 snake_pos.append(random_draw(SNAKE_color))
 
 direction = ''
+Speed = 0.6
+apple_count = 0
 
 #MAIN GAME LOOP
 while loop:
@@ -147,5 +174,5 @@ while loop:
 
     pygame.display.flip()
     pygame.display.update()
-
-    time.sleep(0.4)
+    #speed parameter
+    time.sleep(Speed)
